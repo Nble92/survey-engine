@@ -1,0 +1,20 @@
+{
+  "database": {
+    "type": "sqlite3",
+    "path": "./data/survey.sqlite"
+  },
+  "files": {
+    "path": "./data/survey"
+  },
+  "server": {
+    "listenPort": 8088,
+    "listenAddress": "0.0.0.0",
+    "jwtSigningKey": "8vzT/AewBZ3MfTnv"
+  },
+  "survey": {
+    "name": "circle",
+    "friendlyName": "Sample Survey",
+    "contactName": "Your Name Here",
+    "contactEmail": "your@email.com"
+  }
+}

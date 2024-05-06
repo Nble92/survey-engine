@@ -1,0 +1,16 @@
+[Unit]
+Description = Survey Engine Example Service
+Requires = systemd-user-sessions.service network.target
+After = multi-user.target
+
+[Service]
+User = www-data
+Group = www-data
+Type = simple
+WorkingDirectory = /var/lib/survey-engine
+ExecStart = /usr/local/bin/survey-engine -c /etc/survey-engine/config.json
+Restart = always
+RestartSec = 5
+
+[Install]
+WantedBy = multi-user.target

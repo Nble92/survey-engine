@@ -1,0 +1,9 @@
+.DS_Store
+build
+node_modules
+yarn.lock
+data
+survey-engine
+rice-box.go
+circle.json
+baseline1.json
