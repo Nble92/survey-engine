@@ -50,10 +50,10 @@
             @dragover="allowDrop"
           >
             <template v-for="note in notesMap[date]">
-              <div class="aNote" :key="note.date" @click="noteClick(note.date)" @contextmenu="deleteItem($event, note)" draggable="true" @dragstart="startDraggingItem($event, note)">{{ note.title }}</div>
+              <div class="aNote"  @click="noteClick(note.date)" @contextmenu="deleteItem($event, note)" draggable="true" @dragstart="startDraggingItem($event, note)">{{ note.title }}</div>
             </template>
             <template v-for="event in eventsMap[date]">
-              <div class="anEvent" :key="event.id" @click="eventClick(event.id)" @contextmenu="deleteItem($event, event)" draggable="true" @dragstart="startDraggingItem($event, event)">{{ event.title }}</div>
+              <div class="anEvent" @click="eventClick(event.id)" @contextmenu="deleteItem($event, event)" draggable="true" @dragstart="startDraggingItem($event, event)">{{ event.title }}</div>
             </template>
           </div>
         </template>
@@ -242,9 +242,12 @@
         this.$emit('noteClicked', note)
       },
       
-      startDraggingItem (e, item) {
+      startDraggingItem(e, item) {
+          e.stopPropagation(); // Prevent event from bubbling up
         e.dataTransfer.effectAllowed = 'move'
         e.dataTransfer.setData('item', JSON.stringify(item))
+                console.log("ARE YOU RUSHING OR ARE YOU DRAGGING???")
+
       },
             
       allowDrop (e) {
@@ -252,10 +255,11 @@
       },
       dropItem(e, date) {
         this.selectedItem = JSON.parse(e.dataTransfer.getData('item'))
-        
         if (this.selectedItem.date != date) {
           this.targetDate = date
           this.showMoveCopy = true
+                  console.log("Dropping works")
+
         }
       },
       
@@ -275,8 +279,11 @@
       moveItem() {
         if (this.selectedItem.note) {
           this.$emit('noteMoved', this.selectedItem, this.targetDate)
+          console.log("Note Move Fucking works!")
+
         } else {
           this.$emit('eventMoved', this.selectedItem, this.targetDate)
+          console.log("Event Move Fucking works!")
         }
         this.showMoveCopy = false
       },
@@ -293,11 +300,15 @@
       this.highlightDays()
       this.populateEvents()
       this.populateNotes()
+      console.log("testing testing")
       
       if (this.surveyCreated) {
         var d = new Date(this.surveyCreated)
         this.currentMonth = d.getFullYear() + '-' + this.pad(d.getUTCMonth() + 1) + '-' + this.pad(d.getUTCDate())
       }
+      const stupidElement = document.querySelector('#survey > div.v-application--wrap > main > div > div > div > div > div.flex.pa-0 > div.v-card__text > div > div.layout.align-start.justify-space-around.row.fill-height > div > div > div.v-sheet.theme--light > div')
+      console.log("This stupid element:: ", stupidElement)
+      stupidElement.dragstart = null;
     }
   }
 </script>
