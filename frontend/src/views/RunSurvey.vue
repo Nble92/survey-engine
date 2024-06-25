@@ -617,8 +617,9 @@
       },
       
       loadExistingSurveyWithSessionDataID(surveyName, sessionDataID) {
+
         var that = this
-        
+        console.log("SURVEYYYY NAME!!! " + surveyName + " " + "ID!!!!! " +sessionDataID)
         this.currentSurveySessionDataID = sessionDataID
         this.$store.dispatch('runState/updateState', {surveyName: surveyName, surveySessionDataID: sessionDataID})
         
