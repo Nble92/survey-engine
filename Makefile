@@ -2,13 +2,24 @@ PROJECT_NAME := "survey-engine"
 PKG := "github.com/dchote/$(PROJECT_NAME)"
 PKG_LIST := $(shell go list ${PKG}/... | grep -v /vendor/)
 GO_FILES := $(shell find . -name '*.go' | grep -v /vendor/ | grep -v _test.go)
- 
-.PHONY: all dep lint vet test test-coverage build clean
- 
+
+.PHONY: all dep lint vet test test-coverage build clean setup
+
 all: build
 
-dep: ## Get the dependencies
-	@echo Installing dependencies
+setup: ## Install required packages and setup environment
+	@echo "Updating package list"
+	@sudo apt update
+	@echo "Installing Go and Node.js"
+	@sudo apt install -y golang npm
+	@echo "Installing Yarn"
+	@sudo npm install -g yarn
+	@echo "Creating data directory and SQLite database"
+	@mkdir -p data
+	@touch data/survey.sqlite
+
+dep: setup ## Get the dependencies
+	@echo "Installing dependencies"
 	@go mod download
 	@yarn --cwd ./frontend install
 
@@ -22,24 +33,26 @@ test: ## Run unittests
 	@go test -short ${PKG_LIST}
 
 test-coverage: ## Run tests with coverage
-	@go test -short -coverprofile cover.out -covermode=atomic ${PKG_LIST} 
+	@go test -short -coverprofile cover.out -covermode=atomic ${PKG_LIST}
 	@cat cover.out >> coverage.txt
 
 build: dep ## Build the binary file
-	@echo Building Frontend code
+	@echo "Building Frontend code"
 	@yarn --cwd ./frontend build
-	@echo Building rice-box.go of Frontend assets
+	@echo "Building rice-box.go of Frontend assets"
 	@rice embed-go
-	@echo Building survey-engine binary
+	@echo "Building survey-engine binary"
 	@go build -i -o build/survey-engine $(PKG)
 
-crossbuild: build
-	@echo Building survey-engine Linux binary
-	@env CC=x86_64-linux-musl-gcc GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -ldflags "-linkmode external -extldflags -static" -o build/survey-engine
+copy: ##create three more of this folder for the other variances of the app
+	@cp 
 
-clean: ## Remove previous build
-	@rm -f $(PROJECT_NAME)/build
- 
-help: ## Display this help screen
-	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+crossbuild: build
+	@echo "Building survey-engine Linux binary"
+	@GOOS=linux GOARCH=amd64 go build -o build/survey-engine-linux-amd64 $(PKG)
+
+clean: ## Remove build related file
+	@rm -f cover.out coverage.txt
+	@rm -rf build
+
 
